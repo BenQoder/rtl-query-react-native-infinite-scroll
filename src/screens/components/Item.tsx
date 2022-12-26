@@ -1,6 +1,7 @@
-import { View, Text, StyleSheet, Image } from 'react-native'
+import { View, Text, StyleSheet, Image, Button } from 'react-native'
 import React from 'react'
 import { ItunesItem } from '../../../types'
+import { useRemoveFromSearchMutation } from '../../state/api'
 
 function formatDate(date = "2009-09-01T07:00:00Z") {
     const newDate = new Date(date)
@@ -11,7 +12,28 @@ function formatDate(date = "2009-09-01T07:00:00Z") {
     })
 }
 
-export default function Item({ item }: { item: ItunesItem }) {
+
+// For convenience, we will pass in the query params.
+// This is not Ideal, but it demonstrates how to use the generated hooks.
+
+export default function Item({ item, queryParams }: {
+    item: ItunesItem, queryParams: {
+        term: string,
+        offset: number
+    }
+}) {
+    const [
+        remove
+    ] = useRemoveFromSearchMutation();
+
+    const removeFromSearch = async () => {
+        await remove({
+            ...queryParams,
+            id: item.trackId
+        })
+    };
+
+
     return (
         <View style={styles.item}>
             <Image source={{ uri: item.artworkUrl100 }} style={styles.image} />
@@ -25,6 +47,7 @@ export default function Item({ item }: { item: ItunesItem }) {
                 <Text style={styles.releaseDate}>
                     Released: {formatDate(item.releaseDate)}
                 </Text>
+                <Button title='Remove' onPress={removeFromSearch} />
             </View>
         </View>
     )

@@ -2,12 +2,14 @@ import { FlatList, StyleSheet, Text, TextInput, View } from 'react-native'
 import React from 'react'
 import Item from './components/Item';
 import { itemsAdapter, itemsSelector, useSearchQuery } from '../state/api';
+import { useDebounce } from '@react-hook/debounce';
 
 const ListItems = () => {
     const [offset, setOffset] = React.useState(0);
+    const [term, setTerm] = useDebounce("")
 
     const { data } = useSearchQuery({
-        term: "ben",
+        term,
         offset,
     }, {
         selectFromResult: ({ data, ...otherParams }) => ({
@@ -23,11 +25,14 @@ const ListItems = () => {
             <Text style={styles.title}>
                 List Of Itunes Search
             </Text>
-            <TextInput placeholder='Search Itunes' style={styles.input} />
+            <TextInput onChangeText={setTerm} placeholder='Search Itunes' style={styles.input} />
             <FlatList
                 style={{ flex: 1 }}
                 data={data ?? []}
-                renderItem={({ item }) => <Item item={item} />}
+                renderItem={({ item }) => <Item item={item} queryParams={{
+                    term,
+                    offset
+                }} />}
                 ItemSeparatorComponent={() => <View style={{ height: 15 }} />}
                 onEndReached={() => setOffset(offset + 10)}
             />

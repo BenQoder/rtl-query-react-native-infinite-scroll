@@ -14,9 +14,10 @@ const api = createApi({
     baseQuery: fetchBaseQuery({ baseUrl: "https://itunes.apple.com/" }),
     endpoints: (builder) => ({
         search: builder.query({
+            // This params here are the query params that will be passed to the update query function
             query: ({ term, offset }: {
                 term: string, offset: number
-            }) => `search?term=${term}&limit=10&offset=${offset}`,
+            }) => `search?term=${term}&limit=10&offset=${offset}&entity=song`,
             transformResponse: (response: any) => {
                 return itemsAdapter.addMany(
                     itemsAdapter.getInitialState(),
@@ -35,12 +36,29 @@ const api = createApi({
                 )
             }
         }),
-
+        removeFromSearch: builder.mutation({
+            query: ({ id }) => ({
+                url: "",
+                method: "DELETE",
+                body: id
+            }),
+            // This would work if we had the backend implementation but i think itunes
+            // Is returning some errors
+            // So I will just use the onQueryStated function to update the query data
+            onQueryStarted({ id, ...searchParams }, { dispatch }) {
+                // For update query data to work we need to pass the exact query param 
+                // on the search screen 
+                dispatch(api.util.updateQueryData("search", searchParams, (draft) => {
+                    itemsAdapter.removeOne(draft, id)
+                }))
+            },
+        })
     })
 })
 
 export const {
     useSearchQuery,
+    useRemoveFromSearchMutation
 } = api
 
 export {
