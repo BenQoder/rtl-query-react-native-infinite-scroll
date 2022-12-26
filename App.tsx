@@ -1,11 +1,15 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import ListItems from './src/screens/ListItems';
+import { ApiProvider } from '@reduxjs/toolkit/query/react';
+import api from './src/state/api';
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <ListItems />
+      <ApiProvider api={api}>
+        <ListItems />
+      </ApiProvider>
     </View>
   );
 }

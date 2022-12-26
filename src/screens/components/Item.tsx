@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, Image } from 'react-native'
 import React from 'react'
+import { ItunesItem } from '../../../types'
 
 function formatDate(date = "2009-09-01T07:00:00Z") {
     const newDate = new Date(date)
@@ -10,19 +11,19 @@ function formatDate(date = "2009-09-01T07:00:00Z") {
     })
 }
 
-export default function Item() {
+export default function Item({ item }: { item: ItunesItem }) {
     return (
         <View style={styles.item}>
-            <Image source={{ uri: "https://picsum.photos/100/100" }} style={styles.image} />
+            <Image source={{ uri: item.artworkUrl100 }} style={styles.image} />
             <View style={styles.content}>
                 <Text style={styles.title} numberOfLines={2}>
-                    This is the title
+                    {item.trackName}
                 </Text>
                 <Text style={styles.price}>
-                    Price: USD 10.00
+                    Price: USD {item.trackPrice}
                 </Text>
                 <Text style={styles.releaseDate}>
-                    Released: {formatDate()}
+                    Released: {formatDate(item.releaseDate)}
                 </Text>
             </View>
         </View>

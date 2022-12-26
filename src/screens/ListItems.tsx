@@ -1,15 +1,36 @@
-import { StyleSheet, Text, TextInput, View } from 'react-native'
+import { FlatList, StyleSheet, Text, TextInput, View } from 'react-native'
 import React from 'react'
 import Item from './components/Item';
+import { itemsAdapter, itemsSelector, useSearchQuery } from '../state/api';
 
 const ListItems = () => {
+    const [offset, setOffset] = React.useState(0);
+
+    const { data } = useSearchQuery({
+        term: "ben",
+        offset,
+    }, {
+        selectFromResult: ({ data, ...otherParams }) => ({
+            data: itemsSelector.selectAll(
+                data ?? itemsAdapter.getInitialState()
+            ),
+            ...otherParams
+        }),
+    });
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>
                 List Of Itunes Search
             </Text>
             <TextInput placeholder='Search Itunes' style={styles.input} />
-            <Item />
+            <FlatList
+                style={{ flex: 1 }}
+                data={data ?? []}
+                renderItem={({ item }) => <Item item={item} />}
+                ItemSeparatorComponent={() => <View style={{ height: 15 }} />}
+                onEndReached={() => setOffset(offset + 10)}
+            />
         </View>
     )
 }
